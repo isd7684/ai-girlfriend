@@ -12,9 +12,12 @@
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
+    "@repo/contracts": "workspace:*",
+    "@repo/api": "workspace:*",
     "next": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "hono": "^4.13.8"
   },
   "devDependencies": {
     "tailwindcss": "catalog:",

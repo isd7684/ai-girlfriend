@@ -4,6 +4,7 @@
   "private": true,
   "exports": {
     "./theme.css": "./src/theme.css",
+    "./lib/utils": "./src/lib/utils.ts",
     "./*": "./src/*.tsx"
   },
   "scripts": {
@@ -14,15 +15,21 @@
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "26.4.1",
-    "@types/react": "19.3.0",
-    "@types/react-dom": "19.3.0",
-    "eslint": "10.9.1",
-    "typescript": "7.0.2"
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "eslint": "catalog:",
+    "typescript": "catalog:"
   },
   "dependencies": {
-    "tailwindcss": "catalog:",
-    "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "@radix-ui/react-label": "catalog:",
+    "@radix-ui/react-separator": "catalog:",
+    "@radix-ui/react-slot": "catalog:",
+    "class-variance-authority": "catalog:",
+    "clsx": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tailwind-merge": "catalog:",
+    "tailwindcss": "catalog:"
   }
 }
