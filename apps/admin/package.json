@@ -5,26 +5,38 @@
   "private": true,
   "scripts": {
     "dev": "next dev --port 3006",
+    "dev:test": "dotenv -e .env.test.local -- next dev --port 3006",
     "build": "next build",
+    "build:test": "dotenv -e .env.test.local -- next build",
     "start": "next start",
+    "start:test": "dotenv -e .env.test.local -- next start",
     "lint": "eslint --max-warnings 0",
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@hookform/resolvers": "catalog:",
+    "@repo/contracts": "workspace:*",
     "@repo/ui": "workspace:*",
+    "@tanstack/react-query": "catalog:",
+    "axios": "^1.9.0",
+    "react-hook-form": "catalog:",
+    "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "react-dom": "catalog:"
+    "react-dom": "catalog:",
+    "uuidv7": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
-    "tailwindcss": "catalog:",
-    "@tailwindcss/postcss": "catalog:",
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
+    "@tailwindcss/postcss": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
+    "dotenv-cli": "^8.0.0",
     "eslint": "catalog:",
+    "tailwindcss": "catalog:",
     "typescript": "catalog:"
   }
 }

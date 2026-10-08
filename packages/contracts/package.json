@@ -7,18 +7,13 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "check-types": "tsc --noEmit",
-    "lint": "eslint . --max-warnings 0",
-    "test": "node --experimental-strip-types --test test/*.test.ts"
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "catalog:",
-    "eslint": "catalog:",
     "typescript": "catalog:"
   }
 }

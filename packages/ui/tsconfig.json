@@ -3,9 +3,17 @@
   "compilerOptions": {
     "outDir": "dist",
     "strictNullChecks": true,
+    "baseUrl": ".",
     "paths": {
-      "@repo/ui": ["./src"],
-      "@repo/ui/*": ["./src/*"]
+      "@/components": ["src/components"],
+      "@/components/*": ["src/components/*"],
+      "@/components/ui": ["src/components/ui"],
+      "@/components/ui/*": ["src/components/ui/*"],
+      "@/lib": ["src/lib"],
+      "@/lib/*": ["src/lib/*"],
+      "@/lib/utils": ["src/lib/utils.ts"],
+      "@/hooks": ["src/hooks"],
+      "@/hooks/*": ["src/hooks/*"]
     }
   },
   "include": ["src"],

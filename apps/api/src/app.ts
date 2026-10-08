@@ -1,95 +1,70 @@
-import {
-    BizCode,
-    PingRequestSchema,
-    buildFailure,
-    buildSuccess,
-    type ApiMeta,
-} from '@repo/contracts'
-
+import { BizCode, buildFailure } from '@repo/contracts'
+import { cors } from 'hono/cors'
 import { Hono } from 'hono'
 import { HTTPException } from 'hono/http-exception'
-import { validator } from 'hono/validator'
+import type { ApiBindings } from './bindings'
+import { getApiEnv } from './env'
+import { AppError } from './lib/app-error'
+import { createApiMeta } from './lib/api-meta'
+import routes from './routes'
 
-type AppErrorStatus = 400 | 401 | 403 | 404 | 409 | 422 | 500 | 504
+const app = new Hono<{ Bindings: ApiBindings }>()
 
+app.use('*', async (c, next) => {
+  const env = getApiEnv(c.env)
+  const allowedOrigins = new Set([env.ADMIN_ORIGIN, env.WEB_ORIGIN])
+  const corsMiddleware = cors({
+    origin: (origin) => allowedOrigins.has(origin) ? origin : env.ADMIN_ORIGIN,
+    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization'],
+  })
 
-class AppError extends HTTPException {
-
-    constructor(
-        readonly code: BizCode,
-        message: HTTPExceptionOptions,
-        readonly status: AppErrorStatus,
-        readonly details?: unknown,
-    ) {
-        super(status, message)
-    }
-
-}
-
-const app = new Hono();
-
-
-function createMeta(): ApiMeta {
-    return {
-        requestId: crypto.randomUUID(),
-        timestamp: new Date().toISOString(),
-    }
-}
+  return corsMiddleware(c, next)
+})
 
 app.onError((error, c) => {
-    const meta = createMeta()
+  const meta = createApiMeta()
 
-    if (error instanceof AppError) {
-        const errorMsg = { code: error.code, message: error.message, details: error.details }
-        const res = buildFailure(errorMsg, meta);
-        return c.json(res, error.status);
+  if (error instanceof AppError) {
+    const res = {
+      code: error.code,
+      message: error.message,
+      details: error.details,
     }
 
-    if (error instanceof HTTPException) {
-        const errorMsg = { code: BizCode.COMMON_INVALID_REQUEST, message: error.message }
-        const res = buildFailure(errorMsg, meta);
-        return c.json(res, error.status);
+    return c.json(buildFailure(res, meta), error.status)
+  }
+
+  if (error instanceof HTTPException) {
+    const res = {
+      code: BizCode.COMMON_INVALID_REQUEST,
+      message: error.message,
     }
 
-    console.error(error)
+    return c.json(buildFailure(res, meta), error.status)
+  }
 
-    const errorMsg = { code: BizCode.SYSTEM_INTERNAL_ERROR, message: 'Internal server error' }
-    const res = buildFailure(errorMsg, meta);
-    return c.json(res, 500);
+  console.error(error)
+
+  const res = {
+    code: BizCode.SYSTEM_INTERNAL_ERROR,
+    message: 'Internal server error',
+  }
+
+  return c.json(buildFailure(res, meta), 500)
 })
 
 app.notFound((c) => {
-    const errorMsg = { code: BizCode.COMMON_NOT_FOUND, message: 'Not found' }
-    const res = buildFailure(errorMsg, createMeta());
-    return c.json(res, 404);
+  const res = {
+    code: BizCode.COMMON_NOT_FOUND,
+    message: 'Not found',
+  }
+
+  return c.json(buildFailure(res, createApiMeta()), 404)
 })
 
-const routes = app
-    .get('/health', (c) => {
-        const res = buildSuccess({ service: 'api' }, createMeta());
-        return c.json(res);
-    })
-    .post('/rpc/system/ping', validator('json', (value, c) => {
-        const parsed = PingRequestSchema.safeParse(value)
+app.route('/', routes)
 
-        if (!parsed.success) {
-            const errorMsg = {
-                code: BizCode.COMMON_INVALID_REQUEST,
-                message: 'Invalid request payload',
-                details: parsed.error.flatten(),
-            }
-            return c.json(buildFailure(errorMsg, createMeta()), 400);
-        }
+export type AppType = typeof routes
 
-        return parsed.data
-    }),
-        (c) => {
-            const payload = c.req.valid('json')
-            const successMsg = { service: 'api', message: `pong, ${payload.name}` }
-            const res = buildSuccess(successMsg, createMeta());
-            return c.json(res);
-        });
-
-export type AppType = typeof routes;
-
-export default app;
+export default app

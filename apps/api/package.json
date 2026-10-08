@@ -2,24 +2,35 @@
   "name": "@repo/api",
   "type": "module",
   "exports": {
-    ".": {
-      "types": "./src/index.d.ts",
-      "default": "./src/app.ts"
-    }
+    ".": "./src/app.ts",
+    "./client": "./src/client.ts"
   },
   "scripts": {
     "dev": "wrangler dev",
+    "dev:test": "wrangler dev --env test",
     "deploy": "wrangler deploy --minify",
+    "deploy:test": "wrangler deploy --env test --minify",
+    "deploy:production": "wrangler deploy --env production --minify",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "db:migrate:local": "wrangler d1 migrations apply ai-agent-local-auth --local",
+    "db:seed:local": "wrangler d1 execute ai-agent-local-auth --local --file=./dev/seed-admin.sql",
     "check-types": "tsc --noEmit"
   },
-
   "dependencies": {
+    "@hono/zod-validator": "^0.7.4",
+    "@langchain/core": "^1.1.48",
+    "@langchain/langgraph": "^1.4.1",
+    "@langchain/openai": "^1.4.7",
     "@repo/contracts": "workspace:*",
-    "hono": "^4.13.8"
+    "bcryptjs": "^3.0.3",
+    "drizzle-orm": "catalog:",
+    "hono": "^4.12.14",
+    "jose": "^6.2.3",
+    "uuidv7": "catalog:",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "typescript": "catalog:",
-    "wrangler": "^4.110.0"
+    "wrangler": "^4.4.0"
   }
 }

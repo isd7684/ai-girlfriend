@@ -1,159 +1,148 @@
-# Turborepo starter
+# 付费小册
 
-This Turborepo starter is maintained by the Turborepo core team.
+本实战项目是付费小册[AI Agent 企业级实战](https://aicompanion.usehook.cn/) 中一点一点实现的详细案例，要深入学习的朋友可以购买学习，目前小册已经更新 234 章，讲得很详细，欢迎大家了解
 
-## Using this example
+# AI Agent
 
-Run the following command:
+这是一个基于 pnpm workspace + Turborepo 的 monorepo，包含：
 
-```sh
-npx create-turbo@latest
+- `apps/api`: Cloudflare Workers / Hono API
+- `apps/web`: Web 用户端，Next.js，默认端口 `3005`
+- `apps/admin`: Admin 管理端，Next.js，默认端口 `3006`
+- `packages/*`: 共享 UI、contracts、ESLint 和 TypeScript 配置
+
+## 环境要求
+
+- Node.js `>= 18`
+- pnpm `10.33.1`
+
+建议使用 Corepack 启用 pnpm：
+
+```bash
+node -v
+corepack enable
+corepack prepare pnpm@10.33.1 --activate
+pnpm -v
 ```
 
-## What's inside?
+如果执行 `corepack prepare` 时遇到 `Cannot find matching keyid`，通常是本机 Corepack 版本过旧，先升级：
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `@next/eslint-plugin-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+```bash
+npm install -g corepack@latest
+corepack enable
+corepack prepare pnpm@10.33.1 --activate
 ```
 
-Without global `turbo`, use your package manager:
+也可以临时直接安装 pnpm：
 
-```sh
-cd my-turborepo
-npx turbo build
-pnpm exec turbo build
-pnpm exec turbo build
+```bash
+npm install -g pnpm@10.33.1
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## 安装依赖
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+在项目根目录执行：
 
-```sh
-turbo build --filter=docs
+```bash
+pnpm install
 ```
 
-Without global `turbo`:
+## 准备环境变量
 
-```sh
-npx turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+复制本地环境变量文件：
+
+```bash
+cp apps/api/.dev.vars.example apps/api/.dev.vars
+cp apps/web/.env.example apps/web/.env.local
+cp apps/admin/.env.example apps/admin/.env.local
 ```
 
-### Develop
+如果需要使用聊天或 LLM 能力，可以在 `apps/api/.dev.vars` 中补充：
 
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
+```bash
+DEEPSEEK_API_KEY=你的_key
 ```
 
-Without global `turbo`, use your package manager:
+GitHub OAuth 是可选配置；只验证密码登录时可以先不填写。
 
-```sh
-cd my-turborepo
-npx turbo dev
-pnpm exec turbo dev
-pnpm exec turbo dev
+## 初始化本地 D1 数据库
+
+首次本地运行前，执行 D1 migration 和 seed：
+
+```bash
+pnpm --filter @repo/api db:migrate:local
+pnpm --filter @repo/api db:seed:local
 ```
 
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## 启动项目
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
+建议首次本地调试时分别开三个终端，方便定位哪个服务报错。
 
-```sh
-turbo dev --filter=web
+启动 API：
+
+```bash
+pnpm dev:api
 ```
 
-Without global `turbo`:
+启动 Web 用户端：
 
-```sh
-npx turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
+```bash
+pnpm dev:web
 ```
 
-### Remote Caching
+启动 Admin 管理端：
 
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
+```bash
+pnpm dev:admin
 ```
 
-Without global `turbo`, use your package manager:
+访问地址：
 
-```sh
-cd my-turborepo
-npx turbo login
-pnpm exec turbo login
-pnpm exec turbo login
+- Web 用户端: http://localhost:3005
+- Admin 管理端: http://localhost:3006
+- API: http://127.0.0.1:8787
+
+也可以一次性启动所有服务：
+
+```bash
+pnpm dev
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+## 本地默认账号
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
+Admin 管理端：
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
+```txt
+admin@example.com
+Admin123456!
 ```
 
-Without global `turbo`:
+Web 用户端：
 
-```sh
-npx turbo link
-pnpm exec turbo link
-pnpm exec turbo link
+```txt
+user01@example.com
+Admin123456!
 ```
 
-## Useful Links
+## 常用命令
 
-Learn more about the power of Turborepo:
+```bash
+pnpm lint
+pnpm check-types
+pnpm build
+```
 
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+单独启动某个应用：
+
+```bash
+pnpm dev:api
+pnpm dev:web
+pnpm dev:admin
+```
+
+本地 D1：
+
+```bash
+pnpm --filter @repo/api db:migrate:local
+pnpm --filter @repo/api db:seed:local
+```
