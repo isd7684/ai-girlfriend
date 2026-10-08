@@ -1,4 +1,4 @@
-# AI Agent
+# AI GirlFriend
 
 这是一个基于 pnpm workspace + Turborepo 的 monorepo，包含：
 
